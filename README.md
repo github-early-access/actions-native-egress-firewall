@@ -1,4 +1,6 @@
 # Actions Native Egress Firewall — Early Access
+> [!IMPORTANT]
+> **Status: Technical Preview.** The native egress firewall is currently in technical preview. Audit mode and Layer 7 visibility are available for design partners on Linux. 
 
 Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to a Layer 7 egress firewall for GitHub hosted runners, with both audit and enforcement modes, ahead of public preview.
 
