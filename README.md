@@ -33,7 +33,8 @@ Both paths produce identical Layer 7 enforcement, identical telemetry, and ident
 | GA | Organization and enterprise rule definition via Actions rulesets, managed developer intent rules, log streaming via the Actions data stream | Linux, with Windows and macOS to follow |
 
 ## Example rule file
-
+> [!NOTE]
+> **We want your feedback on this schema.** The rule format below is illustrative and will evolve based on early access input. If a rule kind is missing, a field is awkward to express, or you need a higher level managed rule (for example, "allow npm read only" or "allow GHCR pulls from my org"), please open a [Feature request](../../issues/new?template=feature-request.yml). Concrete examples grounded in a real workflow are the most useful.
 ```yaml
 version: 0.0.1
 mode: allow-list
