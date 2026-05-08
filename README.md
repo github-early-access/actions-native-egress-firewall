@@ -12,7 +12,7 @@ Welcome to the early access program for the **GitHub Actions native egress firew
 
 GitHub hosted runners today allow unrestricted outbound network access. Any workflow can reach any host on the internet, regardless of `GITHUB_TOKEN` permissions, secret scoping, OIDC, or SHA pinning. Those controls govern *identity*, *code*, and *what the workflow can do inside GitHub* — but nothing today governs *where the workflow can talk on the network*.
 
-The native egress firewall closes that gap. It runs **outside** the runner VM at Layer 7, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It complements — and does not replace — OIDC, SHA pinning, and `GITHUB_TOKEN` permissions; together they produce a workflow that is identified, deterministic, least-privileged, and network-bounded.
+The native egress firewall closes that gap. It runs **outside** the runner VM, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It complements — and does not replace — OIDC, SHA pinning, and `GITHUB_TOKEN` permissions; together they produce a workflow that is identified, deterministic, least-privileged, and network-bounded.
 
 The capability ships in two modes:
 
@@ -31,7 +31,7 @@ To support URL-level allow rules, the firewall **terminates TLS at the egress bo
 | Adoption path | Runner type | How it is enabled | Best for |
 |---|---|---|---|
 | Firewall enabled label | Standard GitHub hosted runners | Set `runs-on: ubuntu-24.04-firewall` in the workflow | Individual repositories, open source projects, fast adoption with no admin setup |
-| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Egress Firewall` image when creating the larger runner, or build a custom image based on it | Enterprises that already use larger runners, custom tooling, private networking, or runner groups |
+| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Egress Firewall` image when creating the larger runner | Enterprises that already use larger runners, custom tooling, private networking, or runner groups |
 
 Both paths produce identical Layer 7 enforcement, identical telemetry, and identical rule semantics. Custom larger runner images built on the firewall base image cannot disable or bypass the firewall, because enforcement lives outside the VM.
 
