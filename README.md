@@ -1,7 +1,7 @@
 # Actions Native Egress Firewall — Early Access
 
 > [!IMPORTANT]
-> **Status: Technical Preview.** The native egress firewall is currently in technical preview. Audit mode and Layer 7 visibility are available for design partners on Linux.
+> **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
 > [!NOTE]
 > **Performance during preview.** With the firewall enabled and TLS inspection in the path, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the extra TLS handshake at the egress boundary and a small fixed sidecar cold-start cost. Reducing this overhead (connection reuse, selective inspection, sidecar warmup) is an active investment, and we will publish per-release performance deltas alongside public preview.
@@ -120,42 +120,14 @@ rules:
 
 ### Centralized policy via Actions rulesets (GA)
 
-Administrators reference firewall rule files from an Actions ruleset and target repositories by name, pattern, or custom property — the same model used today for branch protection and push rules.
-
-```yaml
-# Ruleset configuration, illustrative
-name: production-egress
-target:
-  repositories:
-    properties:
-      tier: gold
-      data_classification: restricted
-rules:
-  - type: actions_firewall
-    enforcement: active
-    rule_files:
-      - repo: my-org/security-policies
-        path: firewall/base.yml
-      - repo: my-org/security-policies
-        path: firewall/release.yml
-```
-
-## How this relates to the package firewall
-
-The egress firewall and the package firewall are **complementary** controls on opposite sides of the network connection:
-
-| | What it controls | Where it runs | Decision based on |
-|---|---|---|---|
-| **Package firewall** | *Ingress* into your code: which package versions are allowed to be installed | Registry side | Package metadata, vulnerabilities, malware signals, version pinning |
-| **Native egress firewall** | *Egress* from your runner: which hosts and URLs the workflow may contact | Runner side | Domain, URL, IP, HTTP method as defined in your ruleset |
-
-Use both: the package firewall for *"what code is allowed in"*, the egress firewall for *"where that code is allowed to talk."*
+Administrators reference firewall rule files from an Actions ruleset and target repositories by name, pattern, or custom property. The same model used today for branch protection and push rules.
 
 ## Getting started in early access
+> [!IMPORTANT]
+> **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
 1. Open an [Onboarding request](../../issues/new?template=onboarding.yml) and provide your repository, organization, or enterprise details.
-2. Once onboarded, select a firewall enabled runner. For standard runners, set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Egress Firewall` image (or a custom image based on it).
-3. Run your workflows in **audit mode**, review the recorded traffic against your expectations, then add a rule file at `.github/firewall.yml` to enforce.
+2. Once onboarded, select a firewall enabled runner. For standard runners, set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Egress Firewall` image.
 
 ## Reporting feedback
 
