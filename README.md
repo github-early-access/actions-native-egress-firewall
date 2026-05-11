@@ -1,12 +1,23 @@
 # Actions Native Egress Firewall — Early Access
 
+> [!NOTE]
+> **Performance during preview.** With the firewall enabled, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the virtual machine monitoring your network traffic. Reducing this overhead is an active investment, and we will publish per-release performance deltas alongside public preview.
+
+Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to a Layer 7 egress firewall for GitHub hosted runners, with both audit and enforcement modes.
+
+## Getting started in early access
+
 > [!IMPORTANT]
 > **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
-> [!NOTE]
-> **Performance during preview.** With the firewall enabled and TLS inspection in the path, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the extra TLS handshake at the egress boundary and a small fixed sidecar cold-start cost. Reducing this overhead (connection reuse, selective inspection, sidecar warmup) is an active investment, and we will publish per-release performance deltas alongside public preview.
+1. Open an [Onboarding request](../../issues/new?template=onboarding.yml) and provide your repository, organization, or enterprise details.
+2. Once onboarded, select a firewall enabled runner. For standard runners, all you have to do is set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Egress Firewall` image.
 
-Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to a Layer 7 egress firewall for GitHub hosted runners, with both audit and enforcement modes.
+## Reporting feedback
+
+- [Onboarding request](../../issues/new?template=onboarding.yml) — request access for a repository, organization, or enterprise.
+- [Issue report](../../issues/new?template=issue-report.yml) — report a bug, blocked request, false positive, or unexpected behavior.
+- [Feature request](../../issues/new?template=feature-request.yml) — request a new rule kind, a managed rule, or a platform expansion.
 
 ## What is the native egress firewall?
 
@@ -53,7 +64,7 @@ At GA, rules can be defined at the **enterprise**, **organization**, and **repos
 
 ### Where logs go
 
-- **Preview:** firewall events are surfaced in the workflow run summary and as a workflow run artifact.
+- **Preview:** firewall events are surfaced in the workflow run summary and as a workflow run artifact. We will log the binary name (without command line flags or environment variables) as well as the URL (without query arguments or URL fragment). Be careful that you don't accidentally log secrets in your command name or URL path!
 - **GA:** events stream to the **Actions data stream** with workflow, job, step, and command attribution, ready for ingestion into existing SIEM and detection pipelines.
 
 ## Example rule file
@@ -121,19 +132,6 @@ rules:
 ### Centralized policy via Actions rulesets (GA)
 
 Administrators reference firewall rule files from an Actions ruleset and target repositories by name, pattern, or custom property. The same model used today for branch protection and push rules.
-
-## Getting started in early access
-> [!IMPORTANT]
-> **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
-
-1. Open an [Onboarding request](../../issues/new?template=onboarding.yml) and provide your repository, organization, or enterprise details.
-2. Once onboarded, select a firewall enabled runner. For standard runners, set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Egress Firewall` image.
-
-## Reporting feedback
-
-- [Onboarding request](../../issues/new?template=onboarding.yml) — request access for a repository, organization, or enterprise.
-- [Issue report](../../issues/new?template=issue-report.yml) — report a bug, blocked request, false positive, or unexpected behavior.
-- [Feature request](../../issues/new?template=feature-request.yml) — request a new rule kind, a managed rule, or a platform expansion.
 
 ## Confidentiality
 
