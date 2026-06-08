@@ -72,60 +72,7 @@ At GA, rules can be defined at the **enterprise**, **organization**, and **repos
 > [!NOTE]
 > **We want your feedback on this schema.** The rule formats below are illustrative and will evolve based on early access input. If a rule kind is missing, a field is awkward to express, or you need a higher-level managed rule, please open a [feature request](../../issues/new?template=feature-request.yml).
 
-### Raw rules (preview)
-
-```yaml
-version: 0.0.1
-mode: allow-list
-rules:
-  - kind: dns-rule
-    description: any subdomain of github.com
-    domain: github.com
-    allow-any-subdomain: true
-
-  - kind: http-rule
-    description: pull source and read APIs in my org
-    domains:
-      - api.github.com
-      - github.com
-    scheme: [https]
-    url-path-base: /my-org/
-    methods: [GET]
-
-  - kind: http-rule
-    description: npm registry, read only
-    domains:
-      - registry.npmjs.org
-    scheme: [https]
-    methods: [GET]
-```
-
-### Managed developer-intent rules (GA)
-
-Most customers should not need to write low-level DNS/HTTP rules. Managed rules express intent in terms developers and security teams already share, and expand to the underlying primitives automatically:
-
-```yaml
-version: 0.0.1
-mode: allow-list
-rules:
-  - kind: github-access
-    description: GitHub API and git access, only inside my org
-    endpoints: [api, graphql, git-pull, git-push]
-    orgs: [my-org]
-    enforce-actions-identity: true
-
-  - kind: ghcr
-    description: pull from my org's container registry
-    methods: [pull]
-    orgs: [my-org]
-
-  - kind: http-rule
-    description: npm registry, read only
-    domains:
-      - registry.npmjs.org
-    scheme: [https]
-    methods: [GET]
-```
+TBD
 
 > **Roadmap (aspirational):** a one-line managed rule to scope a workflow's GitHub access to its **own organization** — or even its **own repository** — via `enforce-actions-identity: true`. This is the primary motivation for the managed-rule layer at GA.
 
