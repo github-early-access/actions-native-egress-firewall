@@ -74,12 +74,6 @@ At GA, rules can be defined at the **enterprise**, **organization**, and **repos
 
 TBD
 
-> **Roadmap (aspirational):** a one-line managed rule to scope a workflow's GitHub access to its **own organization** — or even its **own repository** — via `enforce-actions-identity: true`. This is the primary motivation for the managed-rule layer at GA.
-
-### Centralized policy via Actions rulesets (GA)
-
-Administrators reference firewall rule files from an Actions ruleset and target repositories by name, pattern, or custom property. The same model used today for branch protection and push rules.
-
 ## Confidentiality
 
 This is a private early access repository. Do not share screenshots, rule files, runner configurations, or workflow output outside this program without explicit approval. Treat everything in this repository as confidential to the early access program.
