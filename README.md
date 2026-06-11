@@ -15,7 +15,6 @@ Welcome to the early access program for the **GitHub Actions native egress firew
 
 ## Reporting feedback
 
-- [Onboarding request](../../issues/new?template=onboarding.yml) — request access for a repository, organization, or enterprise.
 - [Issue report](../../issues/new?template=issue-report.yml) — report a bug, blocked request, false positive, or unexpected behavior.
 - [Feature request](../../issues/new?template=feature-request.yml) — request a new rule kind, a managed rule, or a platform expansion.
 
