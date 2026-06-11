@@ -10,8 +10,7 @@ Welcome to the early access program for the **GitHub Actions native egress firew
 > [!IMPORTANT]
 > **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
-1. Open an [Onboarding request](../../issues/new?template=onboarding.yml) and provide your repository, organization, or enterprise details.
-2. Once onboarded, select a firewall enabled runner. For standard runners, all you have to do is set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Firewall` image.
+For standard runners, all you have to do is set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Firewall` image. Logs are available as an artifact at the conclusion of a workflow run. 
 
 ## Reporting feedback
 
