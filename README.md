@@ -49,7 +49,7 @@ Both paths produce identical Layer 7 enforcement, identical telemetry, and ident
 | Phase | Capability | Scope |
 |---|---|---|
 | Technical preview | Audit mode | Linux, opt in via runner label or larger runner image |
-| Public preview | Enforcement mode with allow list rules, YAML defined in the repository | Linux, repository level only |
+| Public preview | Enforcement mode with allow list rules. Deny all by default | Linux, repository level only |
 | GA | Organization and enterprise rule definition via **Actions rulesets** (target by name, pattern, or custom repository property), **managed developer-intent rules**, log streaming via the **Actions data stream** | Linux, with Windows and macOS to follow |
 
 ### How rules compose
