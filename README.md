@@ -11,7 +11,7 @@ Welcome to the early access program for the **GitHub Actions native egress firew
 > **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
 1. Open an [Onboarding request](../../issues/new?template=onboarding.yml) and provide your repository, organization, or enterprise details.
-2. Once onboarded, select a firewall enabled runner. For standard runners, all you have to do is set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Egress Firewall` image.
+2. Once onboarded, select a firewall enabled runner. For standard runners, all you have to do is set `runs-on: ubuntu-24.04-firewall`. For larger runners, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Firewall` image.
 
 ## Reporting feedback
 
@@ -42,7 +42,7 @@ To support URL-level allow rules, the firewall **terminates TLS at the egress bo
 | Adoption path | Runner type | How it is enabled | Best for |
 |---|---|---|---|
 | Firewall enabled label | Standard GitHub hosted runners | Set `runs-on: ubuntu-24.04-firewall` in the workflow | Individual repositories, open source projects, fast adoption with no admin setup |
-| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Egress Firewall` image when creating the larger runner | Enterprises that already use larger runners, custom tooling, private networking, or runner groups |
+| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Firewall` image when creating the larger runner | Enterprises that already use larger runners, custom tooling, private networking, or runner groups |
 
 Both paths produce identical Layer 7 enforcement, identical telemetry, and identical rule semantics. Custom larger runner images built on the firewall base image cannot disable or bypass the firewall, because enforcement lives outside the VM.
 
