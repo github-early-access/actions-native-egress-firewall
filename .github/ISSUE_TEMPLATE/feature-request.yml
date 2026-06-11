@@ -1,0 +1,37 @@
+name: Feature request
+description: Request a new rule kind, a managed rule, a platform expansion, or any other enhancement to the native egress firewall.
+title: "[Feature]: "
+labels: ["feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing feedback. The early access program is the best time to shape this product, so don't hold back.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the use case or the gap you're hitting today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like the firewall to do? Rule schema sketches, example YAML, or UX ideas are all welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches or workarounds you've tried or thought about.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Links, examples from other tools, or anything else that would help us understand the request.
+    validations:
+      required: false

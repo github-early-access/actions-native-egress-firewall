@@ -1,0 +1,66 @@
+name: Issue report
+description: Report a bug, blocked request, false positive, or unexpected behavior with the native egress firewall.
+title: "[Issue]: "
+labels: ["issue-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file an issue. Please fill out the fields below so we can investigate.
+
+        Reminder: this is a private early access repository. Do not include secrets, customer data, or anything you would not share with the early access program.
+  - type: input
+    id: repository
+    attributes:
+      label: Repository
+      description: The `owner/repo` where you hit the issue.
+      placeholder: octo-org/octo-repo
+    validations:
+      required: true
+  - type: input
+    id: run-url
+    attributes:
+      label: Workflow run URL
+      description: Link to the workflow run (or job) that demonstrates the problem.
+      placeholder: https://github.com/octo-org/octo-repo/actions/runs/123456789
+    validations:
+      required: false
+  - type: dropdown
+    id: adoption-path
+    attributes:
+      label: Adoption path
+      description: How is the firewall enabled for this workflow?
+      options:
+        - Firewall enabled label (ubuntu-24.04-firewall)
+        - Firewall enabled image (larger runner)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps, workflow snippet, or commands needed to reproduce the behavior.
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Logs, screenshots, related runs, or anything else that would help us investigate.
+    validations:
+      required: false
