@@ -31,9 +31,8 @@ body:
       label: Adoption path
       description: How is the firewall enabled for this workflow?
       options:
-        - Firewall enabled label (ubuntu-24.04-firewall)
-        - Firewall enabled image (larger runner)
-        - Not sure
+        - Firewall enabled label for standard runners (ubuntu-24.04-firewall)
+        - Firewall enabled image for larger runners (Ubuntu 24.04 with Firewall
     validations:
       required: true
   - type: textarea
