@@ -1,14 +1,12 @@
 # Actions Native Egress Firewall — Early Access
+> [!IMPORTANT]
+> **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
-> [!NOTE]
-> **Performance during preview.** With the firewall enabled, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the virtual machine monitoring your network traffic. Reducing this overhead is an active investment, and we will publish per-release performance deltas alongside public preview.
-
-Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to a Layer 7 egress firewall for GitHub hosted runners, with both audit and enforcement modes.
+Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to the firewall for GitHub-hosted runners, with both audit and enforcement (later date).
 
 ## Getting started in early access
 
-> [!IMPORTANT]
-> **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
+The native egress firewall builds on GitHub Actions' existing runner image architecture, but operates within the context of a nested-VM. Separating the runner from the firewall. We provide both a standard firewall enabled runner image and a larger firewall enabled runner image, giving customers the same image options they use today with native egress controls included. For now, logs are available as an artifact at the conclusion of a workflow run.
 
 Runner access in early access:
 
@@ -20,7 +18,9 @@ Runner access in early access:
 
 After approval, ask your administrator to create a Linux larger runner using the GitHub-maintained **`Ubuntu 24.04 with Firewall`** image.
 
-Logs are available as an artifact at the conclusion of a workflow run.
+> [!NOTE]
+> **Performance during preview.** With the firewall enabled, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the virtual machine monitoring your network traffic. Reducing this overhead is an active investment, and we will publish per-release performance deltas alongside public preview.
+
 
 ## Reporting feedback
 
@@ -63,26 +63,7 @@ Both paths produce identical Layer 7 enforcement, identical telemetry, and ident
 | Public preview | Enforcement mode with allow list rules. Deny all by default | Linux, repository level only |
 | GA | Organization and enterprise rule definition via **Actions rulesets** (target by name, pattern, or custom repository property), **managed developer-intent rules**, log streaming via the **Actions data stream** | Linux, with Windows and macOS to follow |
 
-### How rules compose
-
-At GA, rules can be defined at the **enterprise**, **organization**, and **repository** levels. They compose into a single effective allow list at runtime:
-
-- Organization and enterprise rules are **authoritative**. A repository cannot grant itself access the organization has not allowed.
-- A repository **can further restrict** its own egress beyond what the organization allows.
-- The effective policy and its source are recorded with every run for audit.
-
 ### Where logs go
 
 - **Preview:** firewall events are surfaced in the workflow run summary and as a workflow run artifact. We will log the binary name (without command line flags or environment variables) as well as the URL (without query arguments or URL fragment). Be careful that you don't accidentally log secrets in your command name or URL path!
 - **GA:** events stream to the **Actions data stream** with workflow, job, step, and command attribution, ready for ingestion into existing SIEM and detection pipelines.
-
-## Example rule file
-
-> [!NOTE]
-> **We want your feedback on this schema.** The rule formats below are illustrative and will evolve based on early access input. If a rule kind is missing, a field is awkward to express, or you need a higher-level managed rule, please open a [feature request](../../issues/new?template=feature-request.yml).
-
-TBD
-
-## Confidentiality
-
-This is a private early access repository. Do not share screenshots, rule files, runner configurations, or workflow output outside this program without explicit approval. Treat everything in this repository as confidential to the early access program.
