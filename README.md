@@ -10,14 +10,23 @@ Welcome to the early access program for the **GitHub Actions native egress firew
 > [!IMPORTANT]
 > **Status: Technical Preview.** The native egress firewall is currently in technical preview for audit mode without rule enforcement. Linux is the only supported platform at this time.
 
-All users have access to the standard runner label. All you have to do is set `runs-on:` target to `ubuntu-24.04-firewall` in your workflow file. The image is also available for larger runners. For larger runners, use the issue template below to request access. Then, ask your administrator to create a Linux larger runner using the `Ubuntu 24.04 with Firewall` image. 
+Runner access in early access:
 
-Logs are available as an artifact at the conclusion of a workflow run. 
+- **Standard GitHub-hosted runners** are available by default. Set `runs-on: ubuntu-24.04-firewall` in your workflow file.
+- **Larger runners** are available by request during technical preview. Open a [larger runner access request](../../issues/new?template=larger-runner-access-request.yml) and include:
+  - whether access is for an enterprise or organization
+  - the exact enterprise or organization name
+  - a point of contact
+
+After approval, ask your administrator to create a Linux larger runner using the GitHub-maintained **`Ubuntu 24.04 with Firewall`** image.
+
+Logs are available as an artifact at the conclusion of a workflow run.
 
 ## Reporting feedback
 
 - [Issue report](../../issues/new?template=issue-report.yml) — report a bug, blocked request, false positive, or unexpected behavior.
 - [Feature request](../../issues/new?template=feature-request.yml) — request a new rule kind, a managed rule, or a platform expansion.
+- [Larger runner access request](../../issues/new?template=larger-runner-access-request.yml) — request early access to larger runners using the `Ubuntu 24.04 with Firewall` image.
 
 ## What is the native egress firewall?
 

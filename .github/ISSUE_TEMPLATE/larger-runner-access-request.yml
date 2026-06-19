@@ -1,0 +1,39 @@
+name: Request larger runner access
+description: Request access to larger runners using the Ubuntu 24.04 with Firewall image during early access.
+title: "[Larger Runner Access]: "
+labels: ["larger-runner-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in larger runners during early access.
+
+        This issue form is for private early access onboarding to larger runners using **Ubuntu 24.04 with Firewall**.
+
+        Reminder: this is a private early access repository. Do not include secrets or sensitive data.
+  - type: dropdown
+    id: account-type
+    attributes:
+      label: Account type
+      description: Is this request for an organization or enterprise?
+      options:
+        - Organization
+        - Enterprise
+    validations:
+      required: true
+  - type: input
+    id: account-name
+    attributes:
+      label: Organization or Enterprise name
+      description: The exact organization or enterprise name to enable for larger runner access.
+      placeholder: my-org or my-enterprise
+    validations:
+      required: true
+  - type: input
+    id: point-of-contact
+    attributes:
+      label: Point of contact
+      description: GitHub username or email for follow-up questions.
+      placeholder: "@username or email@example.com"
+    validations:
+      required: true
