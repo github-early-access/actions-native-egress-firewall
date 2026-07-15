@@ -37,7 +37,7 @@ The native egress firewall closes that gap. It runs **outside** the runner VM, i
 The capability ships in two modes:
 
 - **Audit mode** records every outbound DNS lookup and HTTP request without blocking anything. This is the safe entry point.
-- **Enforcement mode** applies an allow list. Traffic outside the list is blocked, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
+- **Enforcement mode (Future)** applies an allow list. Traffic outside the list is blocked, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
 
 ### How HTTPS inspection works
 
