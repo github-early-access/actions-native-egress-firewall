@@ -39,6 +39,11 @@ The capability ships in two modes:
 - **Audit mode** records every outbound DNS lookup and HTTP request without blocking anything. This is the safe entry point.
 - **Enforcement mode (Future)** applies an allow list. Traffic outside the list is blocked, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
 
+> [!WARNING]
+> **Audit mode can still affect traffic.** Because the firewall terminates and re-establishes TLS at the egress boundary (see [How HTTPS inspection works](#how-https-inspection-works)), the proxy sits inline with your requests even in audit mode. It can occasionally reject a request the destination never saw, for example returning a proxy-generated `4xx` (such as an empty `HTTP 400`) on certain HTTPS `POST` requests.
+>
+> Treat "audit mode records traffic without blocking anything" as a goal, not a guarantee: audit mode *can* break a workflow. This most often affects Node-based actions calling cloud endpoints, such as [`aws-actions/configure-aws-credentials`](https://github.com/aws-actions/configure-aws-credentials) against AWS STS, where the same request succeeds from `curl` or `botocore` but fails from Node. These responses are not currently attributed to the firewall in the job log. Tracked in [#14](https://github.com/github-early-access/actions-native-egress-firewall/issues/14).
+
 ### How HTTPS inspection works
 
 To support URL-level allow rules, the firewall **terminates TLS at the egress boundary and re-establishes TLS to the destination**. Each workflow run gets a unique, ephemeral certificate that is destroyed when the run ends, so traffic remains private to that run.
