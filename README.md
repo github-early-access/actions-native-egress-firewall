@@ -90,7 +90,7 @@ allow:
   - codeload.github.com
 ```
 
-The following workflow uses the firewall runner with that policy. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in enforcement mode.
+The following workflow uses the firewall runner with the additive policy example. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in enforcement mode.
 
 ```yaml
 name: Test firewall policy
