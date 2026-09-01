@@ -52,26 +52,43 @@ File-based enforcement defines egress policy in a configuration file committed t
 Keeping policy alongside a workflow makes it reviewable in pull requests, version controlled, diffable, and portable with the repository. Use file-based rules when those policy-as-code properties fit your workflow. They can be used instead of, or alongside, other available rule formats.
 
 > [!IMPORTANT]
-> **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema, file discovery, and APIs may change based on customer feedback.
+> **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema (including `no-default-urls`), file discovery, and APIs may change based on customer feedback.
 
 ### Configuration example
 
 The policy file is committed to the repository with the workflow it protects. The preview file path, filename, and discovery mechanism are subject to change; use the onboarding guidance supplied to preview participants to configure the firewall to discover your policy file.
 
+By default, policies allow egress to:
+
+- `github.com`
+- `*blob.core.windows.net` (*)
+- `codeload.github.com`
+- `*actions.githubusercontent.com` (*)
+
+The `(*)` entries are GitHub-managed defaults, not user-configurable wildcard patterns. The firewall expands them to matching URLs returned by the GitHub `/meta` endpoint, so the allowed set cannot escape GitHub-controlled endpoints.
+
+The following example adds `api.github.com` and `release-assets.githubusercontent.com`; the other GitHub endpoints shown above are already covered by the default allow list.
+
 ```yaml
 mode: enforce
+allow:
+  - api.github.com
+  - release-assets.githubusercontent.com
+```
+
+- `mode` selects behavior: `enforce` denies hosts not matched by `allow`; `audit` records traffic without intentionally denying it.
+- `allow` adds hosts to the default allow list.
+
+Set `no-default-urls: true` to disable the default allow list. You must then explicitly list every endpoint your workflow needs, including GitHub endpoints such as `github.com` and `codeload.github.com`.
+
+```yaml
+mode: enforce
+no-default-urls: true
 allow:
   - github.com
   - api.github.com
   - codeload.github.com
-  - "*actions.githubusercontent.com"
-  - release-assets.githubusercontent.com
-  - "*blob.core.windows.net"
 ```
-
-- `mode` selects behavior: `enforce` denies hosts not matched by `allow`; `audit` records traffic without intentionally denying it.
-- `allow` is the host allow list.
-- Entries are host patterns. `*actions.githubusercontent.com` and `*blob.core.windows.net` are wildcard patterns that match the corresponding subdomains. Use exact host names, such as `github.com`, when a wildcard is not needed.
 
 The following workflow uses the firewall runner with that policy. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in enforcement mode.
 
