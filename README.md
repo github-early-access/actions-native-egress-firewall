@@ -1,4 +1,4 @@
-# Actions Native Egress Firewall — Early Access
+# Actions Native Egress Firewall: Early Access
 > [!IMPORTANT]
 > **Status: Technical Preview.** The native egress firewall supports audit mode and file-based enforcement in technical preview. Linux is the only supported platform at this time.
 
@@ -24,9 +24,9 @@ After approval, ask your administrator to create a Linux larger runner using the
 
 ## What is the native egress firewall?
 
-GitHub hosted runners today allow unrestricted outbound network access. Any workflow can reach any host on the internet, regardless of `GITHUB_TOKEN` permissions, secret scoping, OIDC, or SHA pinning. Those controls govern *identity*, *code*, and *what the workflow can do inside GitHub* — but nothing today governs *where the workflow can talk on the network*.
+GitHub hosted runners today allow unrestricted outbound network access. Any workflow can reach any host on the internet, regardless of `GITHUB_TOKEN` permissions, secret scoping, OIDC, or SHA pinning. Those controls govern *identity*, *code*, and *what the workflow can do inside GitHub*, but nothing today governs *where the workflow can talk on the network*.
 
-The native egress firewall closes that gap. It runs **outside** the runner VM, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It complements — and does not replace — OIDC, SHA pinning, and `GITHUB_TOKEN` permissions; together they produce a workflow that is identified, deterministic, least-privileged, and network-bounded.
+The native egress firewall closes that gap. It runs **outside** the runner VM, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It complements OIDC, SHA pinning, and `GITHUB_TOKEN` permissions but does not replace them; together they produce a workflow that is identified, deterministic, least-privileged, and network-bounded.
 
 The capability ships in two modes:
 
@@ -42,7 +42,7 @@ The capability ships in two modes:
 
 To support URL-level allow rules, the firewall **terminates TLS at the egress boundary and re-establishes TLS to the destination**. Each workflow run gets a unique, ephemeral certificate that is destroyed when the run ends, so traffic remains private to that run.
 
-- If your workflow trusts the operating system certificate store (the default for `curl`, `git`, `npm`, `pip`, `docker`, etc.), you will see a normal HTTPS connection — no changes required.
+- If your workflow trusts the operating system certificate store (the default for `curl`, `git`, `npm`, `pip`, `docker`, etc.), you will see a normal HTTPS connection. No changes are required.
 - If your workflow does **certificate pinning** or **mTLS**, you will need to update it to trust the per-run ephemeral certificate.
 
 ## File-based enforcement
@@ -114,21 +114,6 @@ In enforcement mode, a request to a denied host fails from inside the workflow a
 
 Preview firewall events are surfaced in the workflow run summary and as a workflow run artifact. Events include the binary name, without command-line flags or environment variables, and the URL without query arguments or URL fragments. Avoid placing secrets in command names or URL paths.
 
-The following is an **illustrative** summary entry; field names and record shape are subject to change during preview:
-
-```text
-Denied egress: binary=curl host=pypi.org rule=allow-list
-```
-
-An **illustrative** artifact record might be:
-
-```yaml
-outcome: denied
-binary: curl
-host: pypi.org
-rule: allow-list
-```
-
 ## Two delivery paths
 
 | Adoption path | Runner type | How it is enabled | Best for |
@@ -161,9 +146,9 @@ Technical preview participants: please tell us about your experience with:
 - Logging, observability, and troubleshooting.
 - Missing capabilities, edge cases, and scale requirements.
 
-- [Issue report](../../issues/new?template=issue-report.yml) — report a bug, blocked request, false positive, or unexpected behavior.
-- [Feature request](../../issues/new?template=feature-request.yml) — request a new rule kind, a managed rule, or a platform expansion.
-- [Larger runner access request](../../issues/new?template=larger-runner-access-request.yml) — request early access to larger runners using the `Ubuntu 24.04 with Firewall` image.
+- [Issue report](../../issues/new?template=issue-report.yml): report a bug, blocked request, false positive, or unexpected behavior.
+- [Feature request](../../issues/new?template=feature-request.yml): request a new rule kind, a managed rule, or a platform expansion.
+- [Larger runner access request](../../issues/new?template=larger-runner-access-request.yml): request early access to larger runners using the `Ubuntu 24.04 with Firewall` image.
 
 ## Future Direction and Scale Considerations
 
