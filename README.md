@@ -1,8 +1,8 @@
 # Actions Native Egress Firewall: Early Access
 > [!IMPORTANT]
-> **Status: Technical Preview.** The native egress firewall supports audit mode and file-based enforcement in technical preview. Linux is the only supported platform at this time.
+> **Status: Technical Preview.** The native egress firewall supports log mode and file-based enforcement in technical preview. Linux is the only supported platform at this time.
 
-Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to audit and file-based enforcement for GitHub-hosted runners.
+Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to log and file-based enforcement for GitHub-hosted runners.
 
 ## Getting started in early access
 
@@ -30,13 +30,13 @@ The native egress firewall closes that gap. It runs **outside** the runner VM, i
 
 The capability ships in two modes:
 
-- **Audit mode** records every outbound DNS lookup and HTTP request without blocking anything. This is the safe entry point.
-- **Enforcement mode** applies an allow list. Traffic outside the list is blocked by default, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
+- **Log mode** records every outbound DNS lookup and HTTP request without blocking anything. This is the safe entry point.
+- **`enforce` mode** applies an allow list. Traffic outside the list is blocked by default, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
 
 > [!WARNING]
-> **Audit mode can still affect traffic.** Because the firewall terminates and re-establishes TLS at the egress boundary (see [How HTTPS inspection works](#how-https-inspection-works)), the proxy sits inline with your requests even in audit mode. It can occasionally reject a request the destination never saw, for example returning a proxy-generated `4xx` (such as an empty `HTTP 400`) on certain HTTPS `POST` requests.
+> **Log mode can still affect traffic.** Because the firewall terminates and re-establishes TLS at the egress boundary (see [How HTTPS inspection works](#how-https-inspection-works)), the proxy sits inline with your requests even in log mode. It can occasionally reject a request the destination never saw, for example returning a proxy-generated `4xx` (such as an empty `HTTP 400`) on certain HTTPS `POST` requests.
 >
-> Treat "audit mode records traffic without blocking anything" as a goal, not a guarantee: audit mode *can* break a workflow. This most often affects Node-based actions calling cloud endpoints, such as [`aws-actions/configure-aws-credentials`](https://github.com/aws-actions/configure-aws-credentials) against AWS STS, where the same request succeeds from `curl` or `botocore` but fails from Node. These responses are not currently attributed to the firewall in the job log. Tracked in [#14](https://github.com/github-early-access/actions-native-egress-firewall/issues/14).
+> Treat "log mode records traffic without blocking anything" as a goal, not a guarantee: log mode *can* break a workflow. This most often affects Node-based actions calling cloud endpoints, such as [`aws-actions/configure-aws-credentials`](https://github.com/aws-actions/configure-aws-credentials) against AWS STS, where the same request succeeds from `curl` or `botocore` but fails from Node. These responses are not currently attributed to the firewall in the job log. Tracked in [#14](https://github.com/github-early-access/actions-native-egress-firewall/issues/14).
 
 ### How HTTPS inspection works
 
@@ -47,7 +47,7 @@ To support URL-level allow rules, the firewall **terminates TLS at the egress bo
 
 ## File-based enforcement
 
-File-based enforcement defines egress policy in a configuration file committed to your repository. The firewall evaluates that policy at the egress boundary. The file declares a mode and an allow list; in enforcement mode, traffic to hosts outside the allow list is denied by default, recorded, and surfaced back to you.
+File-based enforcement defines egress policy in a configuration file committed to your repository. The firewall evaluates that policy at the egress boundary. The file declares a mode and an allow list; in `enforce` mode, traffic to hosts outside the allow list is denied by default, recorded, and surfaced back to you.
 
 Keeping policy alongside a workflow makes it reviewable in pull requests, version controlled, diffable, and portable with the repository. Use file-based rules when those policy-as-code properties fit your workflow. They can be used instead of, or alongside, other available rule formats.
 
@@ -76,8 +76,14 @@ allow:
   - release-assets.githubusercontent.com
 ```
 
-- `mode` selects behavior: `enforce` denies hosts not matched by `allow`; `audit` records traffic without intentionally denying it.
+- `mode` selects behavior: `enforce` denies hosts not matched by `allow`; `log` records traffic without intentionally denying it.
 - `allow` adds hosts to the default allow list.
+
+### Building your allow list
+
+For the initial run, set `mode: log`. Use the resulting list of outbound URLs and hosts that were requested to construct your `allow` list before switching to `mode: enforce`. Users on Proxima or GitHub Enterprise Cloud with data residency may have extra steps when constructing their allow list.
+
+The [GitHub Enterprise Cloud meta endpoint](https://docs.github.com/en/enterprise-cloud@latest/rest/meta/meta?apiVersion=2026-03-10#get-github-enterprise-cloud-meta-information) can help you understand which groups of domains a particular request belongs to. For example, if a run reaches out to `pipelinesproxwus31.actions.githubusercontent.com`, you may also want to add `pipelinesproxwus32.actions.githubusercontent.com`, since they are members of the same domain group returned by `/meta`.
 
 Set `no-default-urls: true` to disable the default allow list. You must then explicitly list every endpoint your workflow needs, including GitHub endpoints such as `github.com` and `codeload.github.com`.
 
@@ -90,7 +96,7 @@ allow:
   - codeload.github.com
 ```
 
-The following workflow uses the firewall runner with the additive policy example. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in enforcement mode.
+The following workflow uses the firewall runner with the additive policy example. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in `enforce` mode.
 
 ```yaml
 name: Test firewall policy
@@ -110,7 +116,7 @@ jobs:
 
 ## Enforcement results and reporting
 
-In enforcement mode, a request to a denied host fails from inside the workflow as a failed connection or request error in the affected step. The workflow run summary identifies the denied traffic, including the offending command or binary and the rule that denied it.
+In `enforce` mode, a request to a denied host fails from inside the workflow as a failed connection or request error in the affected step. The workflow run summary identifies the denied traffic, including the offending command or binary and the rule that denied it.
 
 Preview firewall events are surfaced in the workflow run summary and as a workflow run artifact. Events include the binary name, without command-line flags or environment variables, and the URL without query arguments or URL fragments. Avoid placing secrets in command names or URL paths.
 
@@ -127,7 +133,7 @@ Both paths produce identical Layer 7 enforcement, identical telemetry, and ident
 
 | Phase | Capability | Scope |
 |---|---|---|
-| Technical preview | Audit mode and file-based enforcement with allow list rules. Deny all by default in enforcement mode | Linux, opt in via runner label or larger runner image |
+| Technical preview | Log mode and file-based enforcement with allow list rules. Deny all by default in `enforce` mode | Linux, opt in via runner label or larger runner image |
 | Public preview | Expanded policy and administration experiences, informed by preview feedback | Scope to be determined |
 | GA | Further capability expansion, informed by customer feedback | Scope to be determined |
 
