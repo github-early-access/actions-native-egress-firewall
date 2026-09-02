@@ -81,9 +81,9 @@ allow:
 
 ### Building your allow list
 
-For the initial run, set `mode: log`. Use the resulting list of outbound URLs and hosts that were requested to construct your `allow` list before switching to `mode: enforce`. Users on Proxima or GitHub Enterprise Cloud with data residency may have extra steps when constructing their allow list.
+For the initial run, set `mode: log`. Use the resulting list of outbound URLs and hosts that were requested to construct your `allow` list before switching to `mode: enforce`. Customers using GitHub Enterprise Cloud with data residency may have additional steps when constructing their allow list because their endpoints and hostnames differ from the standard `github.com` endpoints. Consult the meta endpoint for your own tenant and region.
 
-The [GitHub Enterprise Cloud meta endpoint](https://docs.github.com/en/enterprise-cloud@latest/rest/meta/meta?apiVersion=2026-03-10#get-github-enterprise-cloud-meta-information) can help you understand which groups of domains a particular request belongs to. For example, if a run reaches out to `pipelinesproxwus31.actions.githubusercontent.com`, you may also want to add `pipelinesproxwus32.actions.githubusercontent.com`, since they are members of the same domain group returned by `/meta`.
+The [GitHub Enterprise Cloud meta endpoint](https://docs.github.com/en/enterprise-cloud@latest/rest/meta/meta?apiVersion=2026-03-10#get-github-enterprise-cloud-meta-information) can help you understand which groups of domains a particular request belongs to. For example, if a run reaches out to `pipelinesghubeus47.actions.githubusercontent.com`, you may also want to add `pipelinesghubeus48.actions.githubusercontent.com`, since they are members of the same domain group returned by `/meta`.
 
 Set `no-default-urls: true` to disable the default allow list. You must then explicitly list every endpoint your workflow needs, including GitHub endpoints such as `github.com` and `codeload.github.com`.
 
