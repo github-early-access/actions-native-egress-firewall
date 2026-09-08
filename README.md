@@ -54,9 +54,32 @@ Keeping policy alongside a workflow makes it reviewable in pull requests, versio
 > [!IMPORTANT]
 > **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema (including `no-default-urls`), file discovery, and APIs may change based on customer feedback.
 
+### Where the policy file goes
+
+Follow these steps to add the policy file:
+
+1. Create (or open) the `.github` directory at the root of the repository that contains your workflow.
+2. Add a file named `egress-firewall.yaml` in that directory — the full path must be `.github/egress-firewall.yaml`.
+3. Define your policy in that file (see the configuration example below).
+4. Commit the file to the branch the workflow will run from.
+
+> [!IMPORTANT]
+> Do **not** place `egress-firewall.yaml` in `.github/workflows`. If the file is missing, misnamed, or in the wrong directory, it will not be discovered and no policy will be enforced.
+
+```text
+your-repo/
+├── .github/
+│   ├── egress-firewall.yaml   # ✅ policy file goes here
+│   └── workflows/
+│       └── ci.yml             # ❌ do NOT put egress-firewall.yaml here
+```
+
+> [!NOTE]
+> The policy file is read from the same ref (branch, tag, or SHA) that the workflow runs from—the same ref that Actions uses to resolve the workflow file. For a `workflow_dispatch` run, this is the branch selected in the **Run workflow** branch picker. For a `push` or `pull_request` run, it is the ref that triggered the run. Editing the policy on `main` does not change enforcement for a run started from another branch, and vice versa.
+
 ### Configuration example
 
-The policy file is committed to the repository with the workflow it protects. The preview file path, filename, and discovery mechanism are subject to change; use the onboarding guidance supplied to preview participants to configure the firewall to discover your policy file.
+The policy file is committed to the repository with the workflow it protects. For this technical preview, use the path and filename documented above. The path, filename, and discovery mechanism may change; follow updated onboarding guidance supplied to preview participants.
 
 By default, policies allow egress to:
 
