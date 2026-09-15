@@ -64,7 +64,7 @@ Follow these steps to add the policy file:
 4. Commit the file to the branch the workflow will run from.
 
 > [!IMPORTANT]
-> Do **not** place `egress-firewall.yaml` in `.github/workflows`. If the file is missing, misnamed, or in the wrong directory, it will not be discovered and no policy will be enforced.
+> Do **not** place `egress-firewall.yaml` in `.github/workflows`. If the file is missing, misnamed, or in the wrong directory, it will not be discovered and no policy will be enforced. In addition, the file name is case sensitive. 
 
 ```text
 your-repo/
