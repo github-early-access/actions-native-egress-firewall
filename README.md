@@ -2,11 +2,11 @@
 > [!IMPORTANT]
 > **Status: Technical Preview.** The native egress firewall supports log mode and file-based enforcement in technical preview. Linux is the only supported platform at this time.
 
-Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to log and file-based enforcement for GitHub-hosted runners[...]
+Welcome to the early access program for the **GitHub Actions native egress firewall**. This program gives design partners hands on access to log and file-based enforcement for GitHub-hosted runners.
 
 ## Getting started in early access
 
-The native egress firewall builds on GitHub Actions' existing runner image architecture, but operates within the context of a nested-VM. Separating the runner from the firewall. We provide both a s[...]
+The native egress firewall builds on GitHub Actions' existing runner image architecture, but operates within the context of a nested-VM. Separating the runner from the firewall. We provide both a standard firewall enabled runner image and a larger firewall enabled runner image, giving customers the same image options they use today with native egress controls included. For now, logs are available as an artifact at the conclusion of a workflow run.
 
 Runner access in early access:
 
@@ -19,14 +19,14 @@ Runner access in early access:
 After approval, ask your administrator to create a Linux larger runner using the GitHub-maintained **`Ubuntu 24.04 with Firewall`** image.
 
 > [!NOTE]
-> **Performance during preview.** With the firewall enabled, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the virtual machine monitoring your network[...]
+> **Performance during preview.** With the firewall enabled, expect roughly a **15–20% increase in workflow runtime** for typical workloads, driven by the virtual machine monitoring your network traffic. Reducing this overhead is an active investment, and we will publish per-release performance deltas alongside public preview.
 
 
 ## What is the native egress firewall?
 
-GitHub hosted runners today allow unrestricted outbound network access. Any workflow can reach any host on the internet, regardless of `GITHUB_TOKEN` permissions, secret scoping, OIDC, or SHA pinn[...]
+GitHub hosted runners today allow unrestricted outbound network access. Any workflow can reach any host on the internet, regardless of `GITHUB_TOKEN` permissions, secret scoping, OIDC, or SHA pinning. Those controls govern *identity*, *code*, and *what the workflow can do inside GitHub*, but nothing today governs *where the workflow can talk on the network*.
 
-The native egress firewall closes that gap. It runs **outside** the runner VM, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It[...]
+The native egress firewall closes that gap. It runs **outside** the runner VM, inspects DNS and HTTP/HTTPS traffic, and remains immutable even if a workflow gains root access inside the runner. It complements OIDC, SHA pinning, and `GITHUB_TOKEN` permissions but does not replace them; together they produce a workflow that is identified, deterministic, least-privileged, and network-bounded.
 
 The capability ships in two modes:
 
@@ -34,25 +34,25 @@ The capability ships in two modes:
 - **`enforce` mode** applies an allow list. Traffic outside the list is blocked by default, recorded, and surfaced in the workflow summary with the offending command and the rule that denied it.
 
 > [!WARNING]
-> **Log mode can still affect traffic.** Because the firewall terminates and re-establishes TLS at the egress boundary (see [How HTTPS inspection works](#how-https-inspection-works)), the proxy si[...]
+> **Log mode can still affect traffic.** Because the firewall terminates and re-establishes TLS at the egress boundary (see [How HTTPS inspection works](#how-https-inspection-works)), the proxy sits inline with your requests even in log mode. It can occasionally reject a request the destination never saw, for example returning a proxy-generated `4xx` (such as an empty `HTTP 400`) on certain HTTPS `POST` requests.
 >
-> Treat "log mode records traffic without blocking anything" as a goal, not a guarantee: log mode *can* break a workflow. This most often affects Node-based actions calling cloud endpoints, such a[...]
+> Treat "log mode records traffic without blocking anything" as a goal, not a guarantee: log mode *can* break a workflow. This most often affects Node-based actions calling cloud endpoints, such as [`aws-actions/configure-aws-credentials`](https://github.com/aws-actions/configure-aws-credentials) against AWS STS, where the same request succeeds from `curl` or `botocore` but fails from Node. These responses are not currently attributed to the firewall in the job log. Tracked in [#14](https://github.com/github-early-access/actions-native-egress-firewall/issues/14).
 
 ### How HTTPS inspection works
 
-To support URL-level allow rules, the firewall **terminates TLS at the egress boundary and re-establishes TLS to the destination**. Each workflow run gets a unique, ephemeral certificate that is d[...]
+To support URL-level allow rules, the firewall **terminates TLS at the egress boundary and re-establishes TLS to the destination**. Each workflow run gets a unique, ephemeral certificate that is destroyed when the run ends, so traffic remains private to that run.
 
 - If your workflow trusts the operating system certificate store (the default for `curl`, `git`, `npm`, `pip`, `docker`, etc.), you will see a normal HTTPS connection. No changes are required.
 - If your workflow does **certificate pinning** or **mTLS**, you will need to update it to trust the per-run ephemeral certificate.
 
 ## File-based enforcement
 
-File-based enforcement defines egress policy in a configuration file committed to your repository. The firewall evaluates that policy at the egress boundary. The file declares a mode and an allow [...]
+File-based enforcement defines egress policy in a configuration file committed to your repository. The firewall evaluates that policy at the egress boundary. The file declares a mode and an allow list; in `enforce` mode, traffic to hosts outside the allow list is denied by default, recorded, and surfaced back to you.
 
-Keeping policy alongside a workflow makes it reviewable in pull requests, version controlled, diffable, and portable with the repository. Use file-based rules when those policy-as-code properties [...]
+Keeping policy alongside a workflow makes it reviewable in pull requests, version controlled, diffable, and portable with the repository. Use file-based rules when those policy-as-code properties fit your workflow. They can be used instead of, or alongside, other available rule formats.
 
 > [!IMPORTANT]
-> **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema (including `no-default-urls`), file discovery, and APIs may change based on customer[...]
+> **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema (including `no-default-urls`), file discovery, and APIs may change based on customer feedback.
 
 ### Where the policy file goes
 
@@ -60,8 +60,6 @@ Follow these steps to add the policy file:
 
 1. Create (or open) the `.github` directory at the root of the repository that contains your workflow.
 2. Add a file named `egress-firewall.yaml` in that directory — the full path must be `.github/egress-firewall.yaml`.
-   > [!NOTE]
-   > The file name is case sensitive. Use `egress-firewall.yaml` exactly as shown; `Egress-Firewall.yaml` or any other casing will not be discovered.
 3. Define your policy in that file (see the configuration example below).
 4. Commit the file to the branch the workflow will run from.
 
@@ -77,11 +75,11 @@ your-repo/
 ```
 
 > [!NOTE]
-> The policy file is read from the same ref (branch, tag, or SHA) that the workflow runs from—the same ref that Actions uses to resolve the workflow file. For a `workflow_dispatch` run, this is [...]
+> The policy file is read from the same ref (branch, tag, or SHA) that the workflow runs from—the same ref that Actions uses to resolve the workflow file. For a `workflow_dispatch` run, this is the branch selected in the **Run workflow** branch picker. For a `push` or `pull_request` run, it is the ref that triggered the run. Editing the policy on `main` does not change enforcement for a run started from another branch, and vice versa.
 
 ### Configuration example
 
-The policy file is committed to the repository with the workflow it protects. For this technical preview, use the path and filename documented above. The path, filename, and discovery mechanism ma[...]
+The policy file is committed to the repository with the workflow it protects. For this technical preview, use the path and filename documented above. The path, filename, and discovery mechanism may change; follow updated onboarding guidance supplied to preview participants.
 
 By default, policies allow egress to:
 
@@ -90,7 +88,7 @@ By default, policies allow egress to:
 - `codeload.github.com`
 - `*actions.githubusercontent.com` (*)
 
-The `(*)` entries are GitHub-managed defaults, not user-configurable wildcard patterns. The firewall expands them to matching URLs returned by the GitHub `/meta` endpoint, so the allowed set canno[...]
+The `(*)` entries are GitHub-managed defaults, not user-configurable wildcard patterns. The firewall expands them to matching URLs returned by the GitHub `/meta` endpoint, so the allowed set cannot escape GitHub-controlled endpoints.
 
 The following example adds `api.github.com` and `release-assets.githubusercontent.com`; the other GitHub endpoints shown above are already covered by the default allow list.
 
@@ -106,11 +104,11 @@ allow:
 
 ### Building your allow list
 
-For the initial run, set `mode: log`. Use the resulting list of outbound URLs and hosts that were requested to construct your `allow` list before switching to `mode: enforce`. Customers using Git[...]
+For the initial run, set `mode: log`. Use the resulting list of outbound URLs and hosts that were requested to construct your `allow` list before switching to `mode: enforce`. Customers using GitHub Enterprise Cloud with data residency may have additional steps when constructing their allow list because their endpoints and hostnames differ from the standard `github.com` endpoints. Consult the meta endpoint for your own tenant and region.
 
-The [GitHub Enterprise Cloud meta endpoint](https://docs.github.com/en/enterprise-cloud@latest/rest/meta/meta?apiVersion=2026-03-10#get-github-enterprise-cloud-meta-information) can help you unde[...]
+The [GitHub Enterprise Cloud meta endpoint](https://docs.github.com/en/enterprise-cloud@latest/rest/meta/meta?apiVersion=2026-03-10#get-github-enterprise-cloud-meta-information) can help you understand which groups of domains a particular request belongs to. For example, if a run reaches out to `pipelinesghubeus47.actions.githubusercontent.com`, you may also want to add `pipelinesghubeus48.actions.githubusercontent.com`, since they are members of the same domain group returned by `/meta`.
 
-Set `no-default-urls: true` to disable the default allow list. You must then explicitly list every endpoint your workflow needs, including GitHub endpoints such as `github.com` and `codeload.gith[...]
+Set `no-default-urls: true` to disable the default allow list. You must then explicitly list every endpoint your workflow needs, including GitHub endpoints such as `github.com` and `codeload.github.com`.
 
 ```yaml
 mode: enforce
@@ -121,7 +119,7 @@ allow:
   - codeload.github.com
 ```
 
-The following workflow uses the firewall runner with the additive policy example. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allo[...]
+The following workflow uses the firewall runner with the additive policy example. The first request is allowed; the PyPI request is a representative CI dependency lookup to a host not in the allow list, so it fails in `enforce` mode.
 
 ```yaml
 name: Test firewall policy
@@ -141,18 +139,18 @@ jobs:
 
 ## Enforcement results and reporting
 
-In `enforce` mode, a request to a denied host fails from inside the workflow as a failed connection or request error in the affected step. The workflow run summary identifies the denied traffic, [...]
+In `enforce` mode, a request to a denied host fails from inside the workflow as a failed connection or request error in the affected step. The workflow run summary identifies the denied traffic, including the offending command or binary and the rule that denied it.
 
-Preview firewall events are surfaced in the workflow run summary and as a workflow run artifact. Events include the binary name, without command-line flags or environment variables, and the URL w[...]
+Preview firewall events are surfaced in the workflow run summary and as a workflow run artifact. Events include the binary name, without command-line flags or environment variables, and the URL without query arguments or URL fragments. Avoid placing secrets in command names or URL paths.
 
 ## Two delivery paths
 
 | Adoption path | Runner type | How it is enabled | Best for |
 |---|---|---|---|
-| Firewall enabled label | Standard GitHub hosted runners | Set `runs-on: ubuntu-24.04-firewall` in the workflow | Individual repositories, open source projects, fast adoption with no admin setup[...]
-| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Firewall` image when creating the larger runner | Enterprises that already use larger runners, custom t[...]
+| Firewall enabled label | Standard GitHub hosted runners | Set `runs-on: ubuntu-24.04-firewall` in the workflow | Individual repositories, open source projects, fast adoption with no admin setup |
+| Firewall enabled image | Larger runners | Select the GitHub maintained `Ubuntu 24.04 with Firewall` image when creating the larger runner | Enterprises that already use larger runners, custom tooling, private networking, or runner groups |
 
-Both paths produce identical Layer 7 enforcement, identical telemetry, and identical rule semantics. Custom larger runner images built on the firewall base image cannot disable or bypass the fire[...]
+Both paths produce identical Layer 7 enforcement, identical telemetry, and identical rule semantics. Custom larger runner images built on the firewall base image cannot disable or bypass the firewall, because enforcement lives outside the VM.
 
 ## Phased rollout
 
@@ -164,7 +162,7 @@ Both paths produce identical Layer 7 enforcement, identical telemetry, and ident
 
 ### Where logs go
 
-- **Preview:** firewall events are surfaced in the workflow run summary and as a workflow run artifact. We will log the binary name (without command line flags or environment variables) as well a[...]
+- **Preview:** firewall events are surfaced in the workflow run summary and as a workflow run artifact. We will log the binary name (without command line flags or environment variables) as well as the URL (without query arguments or URL fragment). Be careful that you don't accidentally log secrets in your command name or URL path!
 - **GA:** events stream to the **Actions data stream** with workflow, job, step, and command attribution, ready for ingestion into existing SIEM and detection pipelines.
 
 ## Feedback Requested
@@ -183,6 +181,6 @@ Technical preview participants: please tell us about your experience with:
 
 ## Future Direction and Scale Considerations
 
-We recognize that many customers need to manage and enforce egress policies consistently across large organizations and enterprises. Managing policy across hundreds or thousands of repositories r[...]
+We recognize that many customers need to manage and enforce egress policies consistently across large organizations and enterprises. Managing policy across hundreds or thousands of repositories remains an important requirement for many customers.
 
-Organization-level and enterprise-level management, governance, and policy distribution are not the focus of this technical preview. The immediate goal is to provide meaningful enforcement and va[...]
+Organization-level and enterprise-level management, governance, and policy distribution are not the focus of this technical preview. The immediate goal is to provide meaningful enforcement and validation so customers can begin protecting workflows and provide feedback on the policy model. Feedback gathered during preview will inform future investments in large-scale policy management and administration experiences.
