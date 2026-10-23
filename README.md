@@ -54,6 +54,20 @@ Keeping policy alongside a workflow makes it reviewable in pull requests, versio
 > [!IMPORTANT]
 > **Technical preview.** File-based enforcement is in technical preview. The experience, rule format and schema (including `no-default-urls`), file discovery, and APIs may change based on customer feedback.
 
+### Required workflow permissions
+
+Each job using file-based enforcement must grant its `GITHUB_TOKEN` the `contents: read` permission so the firewall can read `.github/egress-firewall.yaml` from the repository. Set this in your workflow YAML, either at the workflow level or on each job that uses the firewall:
+
+```yaml
+permissions:
+  contents: read
+```
+
+If you already have a `permissions` block, add `contents: read` alongside the permissions your job needs, such as `id-token: write`. When you specify permissions explicitly, any omitted permissions are set to `none`. A job-level `permissions` block overrides workflow-level permissions, so include `contents: read` there too.
+
+> [!WARNING]
+> **Without `contents: read`, no file-based policy is enforced.** During technical preview, the job can run without a warning that the policy was not loaded, even when `.github/egress-firewall.yaml` exists and specifies `mode: enforce`. Selecting a firewall-enabled runner alone is not enough.
+
 ### Where the policy file goes
 
 Follow these steps to add the policy file:
@@ -130,6 +144,8 @@ on:
 jobs:
   egress:
     runs-on: ubuntu-24.04-firewall
+    permissions:
+      contents: read
     steps:
       - name: Allowed GitHub API request
         run: curl --fail --silent --show-error https://api.github.com
